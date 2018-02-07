@@ -5,10 +5,13 @@
 #include "FusionEKF.h"
 #include "tools.h"
 
+
 using namespace std;
+
 
 // for convenience
 using json = nlohmann::json;
+
 
 // Checks if the SocketIO event has JSON data.
 // If there is data the JSON object in string format will be returned,
@@ -26,6 +29,7 @@ std::string hasData(std::string s) {
   return "";
 }
 
+
 int main()
 {
   uWS::Hub h;
@@ -38,7 +42,14 @@ int main()
   vector<VectorXd> estimations;
   vector<VectorXd> ground_truth;
 
-  h.onMessage([&fusionEKF,&tools,&estimations,&ground_truth](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
+
+  /*
+   * MD: what follows is: we pass a lambda function [...](...){...} to the `h.onMessage` method, which -- as it turns
+   * out -- expects a function as its argument. Now, [...] are "captures" (variables that are declared
+   * in this scope that we would like to use in the lambda function's body), and (...) are the actual arguments passed
+   * to the lambda function. And {...} is the actual body of the lambda function, obviously.
+   */
+  h.onMessage([&fusionEKF, &tools, &estimations, &ground_truth](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
     // The 2 signifies a websocket event
@@ -76,8 +87,8 @@ int main()
           		meas_package.raw_measurements_ << px, py;
           		iss >> timestamp;
           		meas_package.timestamp_ = timestamp;
-          } else if (sensor_type.compare("R") == 0) {
 
+          } else if (sensor_type.compare("R") == 0) {
       	  		meas_package.sensor_type_ = MeasurementPackage::RADAR;
           		meas_package.raw_measurements_ = VectorXd(3);
           		float ro;
@@ -90,6 +101,7 @@ int main()
           		iss >> timestamp;
           		meas_package.timestamp_ = timestamp;
           }
+
           float x_gt;
     	  float y_gt;
     	  float vx_gt;
