@@ -80,8 +80,9 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
 void KalmanFilter::MeasurementUpdate() {
     // COMMON FOR BOTH
 
-    MatrixXd S = H_ * P_ * H_.transpose() + R_;
-    K_ = P_ * H_.transpose() * S.inverse();
+    MatrixXd Ht = H_.transpose();
+    MatrixXd S = H_ * P_ * Ht + R_;
+    K_ = P_ * Ht * S.inverse();
 
     x_ += K_ * y_;
     int size = x_.size();

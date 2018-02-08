@@ -148,10 +148,14 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 
     if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
 
-        Hj_ = tools.CalculateJacobian(ekf_.x_);
-        ekf_.H_ = Hj_;
-        ekf_.R_ = R_radar_;
-        ekf_.UpdateEKF(measurement_pack.raw_measurements_);
+        // Check division by zero
+        double p = ekf_.x_(0)*ekf_.x_(0) + ekf_.x_(1)*ekf_.x_(1);
+        if(fabs(p) > 0.0001) {
+            Hj_ = tools.CalculateJacobian(ekf_.x_);
+            ekf_.H_ = Hj_;
+            ekf_.R_ = R_radar_;
+            ekf_.UpdateEKF(measurement_pack.raw_measurements_);
+        }
 
     } else {
 
